@@ -3,6 +3,14 @@ import pandas as pd
 import numpy as np 
 import pickle 
 from sklearn.preprocessing import StandardScaler,LabelBinarizer 
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
+uri = "mongodb+srv://bharatgracy:8081sunny@cluster0.sa3qvy0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+client = MongoClient(uri, server_api=ServerApi('1'))
+db=client['student']
+collection=db["student_pred"]
+
 
 
 def load_model():
@@ -51,6 +59,11 @@ def main():
 
         prediction= predict_data(user_data)
         st.success(f"Your Prediction result is {prediction}")
+        user_data["prediction"]=float(prediction)
+        user_data = {key: int(value) if isinstance(value, np.integer) else float(value) if isinstance(value, np.floating) else value for key, value in user_data.items()}
+
+        collection.insert_one((user_data))
+        
           
 
 
